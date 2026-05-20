@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RPG Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Менеджер RPG персонажей</h1>
+        
+        <!-- Экран входа -->
+        <div id="auth-screen">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('login')">Вход</button>
+                <button class="tab" onclick="showTab('register')">Регистрация</button>
+            </div>
+            
+            <div id="login-form">
+                <input type="text" id="login-username" placeholder="Логин">
+                <input type="password" id="login-password" placeholder="Пароль">
+                <button onclick="login()">Войти</button>
+                <div class="message" id="login-message"></div>
+            </div>
+            
+            <div id="register-form" style="display:none">
+                <input type="text" id="reg-username" placeholder="Логин">
+                <input type="password" id="reg-password" placeholder="Пароль (минимум 4 символа)">
+                <button onclick="register()">Зарегистрироваться</button>
+                <div class="message" id="reg-message"></div>
+            </div>
+        </div>
+        
+        <!-- Экран игрока -->
+        <div id="player-screen" style="display:none">
+            <div class="header">
+                <h2>👤 <span id="player-name"></span></h2>
+                <button onclick="logout()" class="logout">Выйти</button>
+            </div>
+            
+            <div class="section">
+                <h3>➕ Создать персонажа</h3>
+                <input type="text" id="char-name" placeholder="Имя персонажа">
+                <select id="char-system">
+                    <option value="DnD 5e">D&D 5e</option>
+                    <option value="Pathfinder 2e">Pathfinder 2e</option>
+                    <option value="Pathfinder 1e">Pathfinder 1e</option>
+                </select>
+                <input type="text" id="char-class" placeholder="Класс (например: Воин)">
+                <input type="text" id="char-race" placeholder="Раса (например: Человек)">
+                <textarea id="char-info" placeholder="Краткая информация о персонаже..." rows="3"></textarea>
+                <textarea id="char-equipment" placeholder="Снаряжение (например: Меч, Щит, Зелья...)" rows="2"></textarea>
+                <button onclick="createCharacter()">Создать персонажа</button>
+            </div>
+            
+            <div class="section">
+                <h3>🎭 Мои персонажи</h3>
+                <div id="my-characters"></div>
+            </div>
+        </div>
+        
+        <!-- Экран мастера -->
+        <div id="master-screen" style="display:none">
+            <div class="header">
+                <h2>👑 Мастер: <span id="master-name"></span></h2>
+                <button onclick="logout()" class="logout">Выйти</button>
+            </div>
+            
+            <div class="section">
+    <h3>🎁 Изменить характеристики</h3>
+    <select id="char-select">
+        <option value="">Выберите персонажа</option>
+    </select>
+    <input type="number" id="level-give" placeholder="Новый уровень" min="1">
+    <input type="number" id="exp-give" placeholder="Новый опыт" min="0">
+    <input type="number" id="dt-give" placeholder="Новое ДТ" min="0">
+    <button onclick="giveExp()">Обновить</button>
+    <div class="message" id="master-message"></div>
+</div>
+
+<div class="section">
+    <h3>🎭 Мои отслеживаемые персонажи</h3>
+    <div id="master-my-characters"></div>
+</div>
+            
+            <div class="section">
+                <h3>📋 Все персонажи</h3>
+                <div id="all-characters"></div>
+            </div>
+        </div>
+        
+        <!-- Экран админа -->
+        <div id="admin-screen" style="display:none">
+            <div class="header">
+                <h2>⚙️ Администратор: <span id="admin-name"></span></h2>
+                <button onclick="logout()" class="logout">Выйти</button>
+            </div>
+            
+            <div class="section">
+                <h3>👥 Управление пользователями</h3>
+                <div id="users-list"></div>
+            </div>
+            
+            <div class="section">
+    <h3>🎁 Изменить характеристики</h3>
+    <select id="admin-char-select">
+        <option value="">Выберите персонажа</option>
+    </select>
+    <input type="number" id="admin-level-give" placeholder="Новый уровень" min="1">
+    <input type="number" id="admin-exp-give" placeholder="Новый опыт" min="0">
+    <input type="number" id="admin-dt-give" placeholder="Новое ДТ" min="0">
+    <button onclick="adminGiveExp()">Обновить</button>
+    <div class="message" id="admin-message"></div>
+</div>
+            
+            <div class="section">
+                <h3>📋 Все персонажи</h3>
+                <div id="admin-all-characters"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
