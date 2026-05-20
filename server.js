@@ -8,6 +8,10 @@ const app = express();
 const SECRET_KEY = 'rpg-secret-key-2024';
 const DATA_DIR = './data';
 
+// Сохраняем копии данных в переменных
+let usersBackup = [];
+let charactersBackup = [];
+
 // Создаём папку для данных если её нет
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR);
@@ -22,16 +26,37 @@ function loadData(filePath, defaultValue = []) {
     try {
         if (fs.existsSync(filePath)) {
             const data = fs.readFileSync(filePath, 'utf8');
-            return JSON.parse(data);
+            const parsed = JSON.parse(data);
+            // Сохраняем в бекап
+            if (filePath.includes('users')) usersBackup = parsed;
+            if (filePath.includes('characters')) charactersBackup = parsed;
+            return parsed;
         }
     } catch (error) {
         console.error(`Ошибка загрузки ${filePath}:`, error);
+        // Если файл повреждён - восстанавливаем из бекапа
+        if (filePath.includes('users') && usersBackup.length > 0) return usersBackup;
+        if (filePath.includes('characters') && charactersBackup.length > 0) return charactersBackup;
     }
     return defaultValue;
 }
 
 function saveData(filePath, data) {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    try {
+        // Сохраняем в бекап
+        if (filePath.includes('users')) usersBackup = data;
+        if (filePath.includes('characters')) charactersBackup = data;
+        
+        // Создаём папку если её нет
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    } catch (error) {
+        console.error(`Ошибка сохранения ${filePath}:`, error);
+    }
 }
 
 // Загружаем данные
