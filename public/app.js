@@ -1,5 +1,9 @@
 let token = localStorage.getItem('rpg_token') || '';
 let currentUser = null;
+function goToAuth() {
+    document.getElementById('title-screen').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'block';
+}
 
 // Автоматический вход при загрузке страницы
 window.onload = async function() {
@@ -161,6 +165,20 @@ function logout() {
 
 // Создать персонажа
 async function createCharacter() {
+    // Проверяем лимит
+    try {
+        const countResponse = await fetch('/api/character-count', {
+            headers: { 'Authorization': token }
+        });
+        const countData = await countResponse.json();
+        
+        if (countData.count >= countData.max) {
+            alert(`Достигнут лимит персонажей (${countData.max}). Удалите ненужных чтобы создать новых.`);
+            return;
+        }
+    } catch (error) {
+        console.error('Ошибка проверки лимита:', error);
+    }
     const name = document.getElementById('char-name').value.trim();
     const system = document.getElementById('char-system').value;
     const characterClass = document.getElementById('char-class').value.trim();
@@ -355,6 +373,22 @@ function createCharacterCard(char, showEdit = false, isMaster = false) {
                 <button class="upload-btn" onclick="uploadAvatar(${char.id})">📷 Фото</button>
             </div>
         `;
+        let actionsHtml = '';
+if (showEdit) {
+    actionsHtml = `
+        <div class="character-actions">
+            <button class="edit-btn" onclick="editCharacter('${encodeURIComponent(JSON.stringify(char))}')">✏️ Редактировать</button>
+            <button class="upload-btn" onclick="uploadAvatar(${char.id})">📷 Фото</button>
+            <button class="delete-btn" onclick="deleteCharacter(${char.id}, '${char.name.replace(/'/g, "\\'")}')">🗑️ Удалить</button>
+            ${isMaster ? `
+    <div class="character-actions" style="margin-top:10px;">
+        <button class="edit-btn" onclick="showEditStatsModal('${encodeURIComponent(JSON.stringify(char))}')">📊 Изменить хар-ки</button>
+        <button class="delete-btn" onclick="deleteCharacter(${char.id}, '${char.name.replace(/'/g, "\\'")}')">🗑️ Удалить</button>
+    </div>
+` : ''}
+        </div>
+    `;
+}
     }
     
     return `
@@ -392,6 +426,7 @@ function createCharacterCard(char, showEdit = false, isMaster = false) {
             ` : ''}
         </div>
     `;
+    
 }
 
 // Редактировать персонажа
@@ -766,4 +801,38 @@ async function makeMaster(userId) {
     } catch (error) {
         alert('Ошибка');
     }
+    // Удалить персонажа
+async function deleteCharacter(id, name) {
+    if (!confirm(`Вы уверены, что хотите удалить персонажа "${name}"?\nЭто действие нельзя отменить!`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/characters/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': token }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            // Перезагружаем списки
+            if (currentUser.role === 'player') {
+                loadMyCharacters();
+            } else if (currentUser.role === 'master') {
+                loadMasterCharacters();
+                loadAllCharactersMaster();
+                loadCharacterSelectMaster();
+            } else if (currentUser.role === 'admin') {
+                loadAllCharactersAdmin();
+                loadCharacterSelectAdmin();
+            }
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        alert('Ошибка удаления');
+    }
+}
 }

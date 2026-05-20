@@ -7,6 +7,43 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Титульный экран -->
+<div id="title-screen" class="screen">
+    <div class="title-container">
+        <h1 class="title-main">🎲 RPG Manager</h1>
+        <p class="title-subtitle">Управление персонажами для D&D и Pathfinder</p>
+        
+        <div class="title-menu">
+            <button class="title-btn" onclick="goToAuth()">
+                <span class="btn-icon">🔑</span>
+                <span>Войти / Регистрация</span>
+            </button>
+            
+            <button class="title-btn" onclick="window.open('https://github.com/katar780/rpg-manager', '_blank')">
+                <span class="btn-icon">📖</span>
+                <span>О проекте</span>
+            </button>
+        </div>
+        
+        <div class="title-features">
+            <div class="feature-card">
+                <span class="feature-icon">🎭</span>
+                <h3>Персонажи</h3>
+                <p>Создавайте и управляйте персонажами</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">👑</span>
+                <h3>Мастер</h3>
+                <p>Выдавайте опыт и следите за игроками</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📊</span>
+                <h3>Статистика</h3>
+                <p>Уровни, опыт и ДТ всегда под рукой</p>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="container">
         <h1>🎲 Менеджер RPG персонажей</h1>
         

@@ -260,7 +260,13 @@ app.post('/api/upload-avatar/:id', checkToken, upload.single('avatar'), (req, re
 
 // Создать персонажа
 app.post('/api/characters', checkToken, (req, res) => {
-    const { name, characterClass, race, system, info, equipment } = req.body;
+    // Проверка лимита
+    const userCharCount = characters.filter(c => c.user_id === req.user.id).length;
+    if (userCharCount >= 10) {
+        return res.json({ success: false, message: 'Достигнут лимит: максимум 10 персонажей' });
+    }
+    
+    // ... остальной код
     
     if (!name) {
         return res.json({ success: false, message: 'Введите имя персонажа' });
@@ -337,6 +343,47 @@ app.get('/api/all-characters', checkToken, checkMaster, (req, res) => {
         };
     });
     res.json({ success: true, characters: allChars });
+});
+// Удалить персонажа
+app.delete('/api/characters/:id', checkToken, (req, res) => {
+    const charId = parseInt(req.params.id);
+    const character = characters.find(c => c.id === charId);
+    
+    if (!character) {
+        return res.json({ success: false, message: 'Персонаж не найден' });
+    }
+    
+    // Игрок может удалить только своего, мастер и админ могут удалить любого
+    if (req.user.role === 'player' && character.user_id !== req.user.id) {
+        return res.json({ success: false, message: 'Это не ваш персонаж' });
+    }
+    
+    // Удаляем аватар если есть
+    if (character.avatar) {
+        const avatarPath = path.join(__dirname, 'public', character.avatar);
+        if (fs.existsSync(avatarPath)) {
+            fs.unlinkSync(avatarPath);
+        }
+    }
+    
+    characters = characters.filter(c => c.id !== charId);
+    saveData(CHARACTERS_FILE, characters);
+    
+    // Убираем персонажа из списков мастера
+    users.forEach(user => {
+        if (user.playerCharacters) {
+            user.playerCharacters = user.playerCharacters.filter(id => id !== charId);
+        }
+    });
+    saveData(USERS_FILE, users);
+    
+    res.json({ success: true, message: 'Персонаж удалён!' });
+});
+
+// Получить количество персонажей пользователя
+app.get('/api/character-count', checkToken, (req, res) => {
+    const count = characters.filter(c => c.user_id === req.user.id).length;
+    res.json({ success: true, count, max: 10 });
 });
 
 // Мастер добавляет персонажа к себе по ID
