@@ -260,13 +260,13 @@ app.post('/api/upload-avatar/:id', checkToken, upload.single('avatar'), (req, re
 
 // Создать персонажа
 app.post('/api/characters', checkToken, (req, res) => {
+    const { name, characterClass, race, system, info, equipment } = req.body;
+    
     // Проверка лимита
     const userCharCount = characters.filter(c => c.user_id === req.user.id).length;
     if (userCharCount >= 10) {
         return res.json({ success: false, message: 'Достигнут лимит: максимум 10 персонажей' });
     }
-    
-    // ... остальной код
     
     if (!name) {
         return res.json({ success: false, message: 'Введите имя персонажа' });
