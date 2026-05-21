@@ -11,8 +11,8 @@ const SECRET_KEY = 'rpg-secret-key-2024';
 
 // Прямое подключение к PostgreSQL
 const pool = new Pool({
-    host: 'aws-0-eu-central-1.pooler.supabase.com',
-    port: 6543,
+    host: 'db.ujoacgyobabcslptdmpq.supabase.co',
+port: 5432,
     database: 'postgres',
     user: 'postgres.ujoacgyobabcslptdmpq',
     password: 'RpgPassword123!222',
